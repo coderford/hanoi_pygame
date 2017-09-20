@@ -17,7 +17,9 @@ white = (255, 255, 255)
 black = (0, 0, 0)
 red = (255, 0, 0)
 gold = (239, 229, 51)
-blue = (78,162,196)
+blue = (78,162,196) 
+grey = (170, 170, 170)
+green = (77, 206, 145)
 
 def blit_text(screen, text, midtop, aa=True, font=None, font_name = None, size = None, color=(255,0,0)):
     if font is None:                                    # font option is provided to save memory if font is
@@ -32,7 +34,8 @@ def menu_screen():  # to be called before starting actual game loop
     menu_done = False
     while not menu_done:  # every screen/scene/level has its own loop
         screen.fill(white)
-        blit_text(screen, 'Towers of Hanoi', (320,100), font_name='sans serif', size=90, color=gold)
+        blit_text(screen, 'Towers of Hanoi', (323,122), font_name='sans serif', size=90, color=grey)
+        blit_text(screen, 'Towers of Hanoi', (320,120), font_name='sans serif', size=90, color=gold)
         blit_text(screen, 'Use arrow keys to select difficulty:', (320, 220), font_name='sans serif', size=30, color=black)
         blit_text(screen, str(plates), (320, 260), font_name='sans serif', size=40, color=blue)
         for event in pygame.event.get():
@@ -52,16 +55,23 @@ def menu_screen():  # to be called before starting actual game loop
                 game_done = True
         pygame.display.flip()
         clock.tick(60)
+def draw_towers():
+    global screen
+    for xpos in range(40, 460+1, 200):
+        pygame.draw.rect(screen, green, pygame.Rect(xpos, 400, 160 , 20))
+        pygame.draw.rect(screen, grey, pygame.Rect(xpos+75, 150, 10, 250))
 
 menu_screen()
 # main game loop:
 while not game_done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            done = True
+            game_done = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                done = True
+                game_done = True
     screen.fill(white)
+    draw_towers()
+    blit_text(screen, 'Steps: '+str(steps), (320, 20), font_name='mono', size=30, color=black)
     pygame.display.flip()
     clock.tick(framerate)
