@@ -1,3 +1,3 @@
 # Towers of Hanoi - Pygame
 
-A visualizer for solutions of "Towers of Hanoi" puzzle
+Towers of Hanoi puzzle as a game using python3 and pygame
