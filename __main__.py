@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys, time
 
 pygame.init()
 pygame.display.set_caption("Towers of Hanoi")
@@ -14,6 +14,8 @@ n_disks = 3
 disks = []
 towers_midx = [120, 320, 520]
 pointing_at = 0
+floating = False
+floater = 0
 
 # colors:
 white = (255, 255, 255)
@@ -58,11 +60,24 @@ def menu_screen():  # to be called before starting actual game loop
                 game_done = True
         pygame.display.flip()
         clock.tick(60)
+
+def game_over(): # game over screen
+    global screen, steps
+    screen.fill(white)
+    blit_text(screen, 'You Won!', (320, 200), font_name='sans serif', size=72, color=gold)
+    blit_text(screen, 'You Won!', (322, 202), font_name='sans serif', size=72, color=gold)
+    blit_text(screen, 'Steps: '+str(steps), (320, 400), font_name='mono', size=30, color=black)
+    pygame.display.flip()
+    time.sleep(2)   # wait for 2 secs 
+    pygame.quit()   #pygame exit
+    sys.exit()  #console exit
+
 def draw_towers():
     global screen
     for xpos in range(40, 460+1, 200):
         pygame.draw.rect(screen, green, pygame.Rect(xpos, 400, 160 , 20))
         pygame.draw.rect(screen, grey, pygame.Rect(xpos+75, 200, 10, 200))
+
 
 def make_disks():
     global n_disks, disks
@@ -74,6 +89,7 @@ def make_disks():
         disk['rect'] = pygame.Rect(0, 0, width, height)
         disk['rect'].midtop = (120, ypos)
         disk['val'] = n_disks-i
+        disk['tower'] = 0
         disks.append(disk)
         ypos -= height+3
         width -= 23
@@ -90,6 +106,16 @@ def draw_ptr():
     pygame.draw.polygon(screen, red, ptr_points)
     return
 
+def check_won():
+    global disks
+    over = True
+    for disk in disks:
+        if disk['tower'] != 2:
+            over = False
+    if over:
+        time.sleep(0.2)
+        game_over()
+
 menu_screen()
 make_disks()
 # main game loop:
@@ -102,13 +128,38 @@ while not game_done:
                 game_done = True
             if event.key == pygame.K_RIGHT:
                 pointing_at = (pointing_at+1)%3
+                if floating:
+                    disks[floater]['rect'].midtop = (towers_midx[pointing_at], 100)
+                    disks[floater]['tower'] = pointing_at
             if event.key == pygame.K_LEFT:
                 pointing_at = (pointing_at-1)%3
-
+                if floating:
+                    disks[floater]['rect'].midtop = (towers_midx[pointing_at], 100)
+                    disks[floater]['tower'] = pointing_at
+            if event.key == pygame.K_UP and not floating:
+                for disk in disks[::-1]:
+                    if disk['tower'] == pointing_at:
+                        floating = True
+                        floater = disks.index(disk)
+                        disk['rect'].midtop = (towers_midx[pointing_at], 100)
+                        break
+            if event.key == pygame.K_DOWN and floating:
+                for disk in disks[::-1]:
+                    if disk['tower'] == pointing_at and disks.index(disk)!=floater:
+                        if disk['val']>disks[floater]['val']:
+                            floating = False
+                            disks[floater]['rect'].midtop = (towers_midx[pointing_at], disk['rect'].top-23)
+                            steps += 1
+                            break
+                else: 
+                    floating = False
+                    disks[floater]['rect'].midtop = (towers_midx[pointing_at], 400-23)
+                    steps += 1
     screen.fill(white)
     draw_towers()
     draw_disks()
     draw_ptr()
     blit_text(screen, 'Steps: '+str(steps), (320, 20), font_name='mono', size=30, color=black)
     pygame.display.flip()
+    if not floating:check_won()
     clock.tick(framerate)
