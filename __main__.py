@@ -10,8 +10,10 @@ framerate = 60
 
 # game vars:
 steps = 0
-n_plates = 3
-plates = []
+n_disks = 3
+disks = []
+towers_midx = [120, 320, 520]
+pointing_at = 0
 
 # colors:
 white = (255, 255, 255)
@@ -31,26 +33,26 @@ def blit_text(screen, text, midtop, aa=True, font=None, font_name = None, size =
     screen.blit(font_surface, font_rect)
 
 def menu_screen():  # to be called before starting actual game loop
-    global screen, n_plates, game_done
+    global screen, n_disks, game_done
     menu_done = False
     while not menu_done:  # every screen/scene/level has its own loop
         screen.fill(white)
         blit_text(screen, 'Towers of Hanoi', (323,122), font_name='sans serif', size=90, color=grey)
         blit_text(screen, 'Towers of Hanoi', (320,120), font_name='sans serif', size=90, color=gold)
         blit_text(screen, 'Use arrow keys to select difficulty:', (320, 220), font_name='sans serif', size=30, color=black)
-        blit_text(screen, str(n_plates), (320, 260), font_name='sans serif', size=40, color=blue)
+        blit_text(screen, str(n_disks), (320, 260), font_name='sans serif', size=40, color=blue)
         for event in pygame.event.get():
             if event.type==pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     menu_done = True
                 if event.key in [pygame.K_RIGHT, pygame.K_UP]:
-                    n_plates += 1
-                    if n_plates > 6:
-                        n_plates = 6
+                    n_disks += 1
+                    if n_disks > 6:
+                        n_disks = 6
                 if event.key in [pygame.K_LEFT, pygame.K_DOWN]:
-                    n_plates -= 1
-                    if n_plates < 1:
-                        n_plates = 1
+                    n_disks -= 1
+                    if n_disks < 1:
+                        n_disks = 1
             if event.type == pygame.QUIT:
                 menu_done = True
                 game_done = True
@@ -62,29 +64,34 @@ def draw_towers():
         pygame.draw.rect(screen, green, pygame.Rect(xpos, 400, 160 , 20))
         pygame.draw.rect(screen, grey, pygame.Rect(xpos+75, 200, 10, 200))
 
-def make_plates():
-    global n_plates, plates
+def make_disks():
+    global n_disks, disks
     height = 20
     ypos = 397 - height
-    width = n_plates * 23
-    for i in range(n_plates):
-        plate = {}
-        plate['rect'] = pygame.Rect(0, 0, width, height)
-        plate['rect'].midtop = (120, ypos)
-        plate['val'] = n_plates-i
-        plates.append(plate)
+    width = n_disks * 23
+    for i in range(n_disks):
+        disk = {}
+        disk['rect'] = pygame.Rect(0, 0, width, height)
+        disk['rect'].midtop = (120, ypos)
+        disk['val'] = n_disks-i
+        disks.append(disk)
         ypos -= height+3
         width -= 23
 
 
-def draw_plates():
-    global screen, plates
-    for plate in plates:
-        pygame.draw.rect(screen, blue, plate['rect'])
+def draw_disks():
+    global screen, disks
+    for disk in disks:
+        pygame.draw.rect(screen, blue, disk['rect'])
+    return
 
+def draw_ptr():
+    ptr_points = [(towers_midx[pointing_at]-7 ,440), (towers_midx[pointing_at]+7, 440), (towers_midx[pointing_at], 433)]
+    pygame.draw.polygon(screen, red, ptr_points)
+    return
 
 menu_screen()
-make_plates()
+make_disks()
 # main game loop:
 while not game_done:
     for event in pygame.event.get():
@@ -93,9 +100,15 @@ while not game_done:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 game_done = True
+            if event.key == pygame.K_RIGHT:
+                pointing_at = (pointing_at+1)%3
+            if event.key == pygame.K_LEFT:
+                pointing_at = (pointing_at-1)%3
+
     screen.fill(white)
     draw_towers()
-    draw_plates()
+    draw_disks()
+    draw_ptr()
     blit_text(screen, 'Steps: '+str(steps), (320, 20), font_name='mono', size=30, color=black)
     pygame.display.flip()
     clock.tick(framerate)
