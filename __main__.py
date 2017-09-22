@@ -150,7 +150,7 @@ while not game_done:
                             floating = False
                             disks[floater]['rect'].midtop = (towers_midx[pointing_at], disk['rect'].top-23)
                             steps += 1
-                            break
+                        break
                 else: 
                     floating = False
                     disks[floater]['rect'].midtop = (towers_midx[pointing_at], 400-23)
