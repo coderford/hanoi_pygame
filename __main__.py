@@ -46,6 +46,9 @@ def menu_screen():  # to be called before starting actual game loop
         blit_text(screen, 'Press ENTER to continue', (320, 320), font_name='sans_serif', size=30, color=black)
         for event in pygame.event.get():
             if event.type==pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    menu_done = True
+                    game_done = True
                 if event.key == pygame.K_RETURN:
                     menu_done = True
                 if event.key in [pygame.K_RIGHT, pygame.K_UP]:
@@ -90,6 +93,7 @@ def draw_towers():
 
 def make_disks():
     global n_disks, disks
+    disks = []
     height = 20
     ypos = 397 - height
     width = n_disks * 23
@@ -125,6 +129,16 @@ def check_won():
         time.sleep(0.2)
         game_over()
 
+def reset():
+    global steps,pointing_at,floating,floater
+    steps = 0
+    pointing_at = 0
+    floating = False
+    floater = 0
+    menu_screen()
+    make_disks()
+
+
 menu_screen()
 make_disks()
 # main game loop:
@@ -134,6 +148,8 @@ while not game_done:
             game_done = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
+                reset()
+            if event.key == pygame.K_q:
                 game_done = True
             if event.key == pygame.K_RIGHT:
                 pointing_at = (pointing_at+1)%3
