@@ -43,6 +43,7 @@ def menu_screen():  # to be called before starting actual game loop
         blit_text(screen, 'Towers of Hanoi', (320,120), font_name='sans serif', size=90, color=gold)
         blit_text(screen, 'Use arrow keys to select difficulty:', (320, 220), font_name='sans serif', size=30, color=black)
         blit_text(screen, str(n_disks), (320, 260), font_name='sans serif', size=40, color=blue)
+        blit_text(screen, 'Press ENTER to continue', (320, 320), font_name='sans_serif', size=30, color=black)
         for event in pygame.event.get():
             if event.type==pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
@@ -64,9 +65,13 @@ def menu_screen():  # to be called before starting actual game loop
 def game_over(): # game over screen
     global screen, steps
     screen.fill(white)
+    min_steps = 2**n_disks-1
     blit_text(screen, 'You Won!', (320, 200), font_name='sans serif', size=72, color=gold)
     blit_text(screen, 'You Won!', (322, 202), font_name='sans serif', size=72, color=gold)
-    blit_text(screen, 'Steps: '+str(steps), (320, 400), font_name='mono', size=30, color=black)
+    blit_text(screen, 'Your Steps: '+str(steps), (320, 360), font_name='mono', size=30, color=black)
+    blit_text(screen, 'Minimum Steps: '+str(min_steps), (320, 390), font_name='mono', size=30, color=red)
+    if min_steps==steps:
+        blit_text(screen, 'You finished in minumum steps!', (320, 300), font_name='mono', size=26, color=green)
     pygame.display.flip()
     time.sleep(2)   # wait for 2 secs 
     pygame.quit()   #pygame exit
@@ -77,6 +82,10 @@ def draw_towers():
     for xpos in range(40, 460+1, 200):
         pygame.draw.rect(screen, green, pygame.Rect(xpos, 400, 160 , 20))
         pygame.draw.rect(screen, grey, pygame.Rect(xpos+75, 200, 10, 200))
+    blit_text(screen, 'Start', (towers_midx[0], 403), font_name='mono', size=14, color=black)
+    blit_text(screen, 'Finish', (towers_midx[2], 403), font_name='mono', size=14, color=black)
+
+    
 
 
 def make_disks():
